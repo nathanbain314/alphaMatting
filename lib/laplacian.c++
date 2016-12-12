@@ -155,15 +155,15 @@ int main( int argc, char **argv )
   {
     CmdLine cmd("Generates an alphamap from a trimap.", ' ', "1.0");
 
-    SwitchArg generateSwitch("g","generate","Generate trimap from foregound and background", cmd, false);
+    SwitchArg generateSwitch("g","generate","Use foregound and background maps instead of trimap", cmd, false);
 
     ValueArg<double> epsilonArg( "e", "epsilon", "Epsilon value", false, 0.0000001, "double", cmd);
 
-    ValueArg<string> backgroundArg( "b", "background", "Foreground mask", false, "background.mask", "string", cmd);
+    ValueArg<string> backgroundArg( "b", "background", "Background map", false, "background.png", "string", cmd);
 
-    ValueArg<string> foregroundArg( "f", "foreground", "Background mask", false, "foreground.mask", "string", cmd);
+    ValueArg<string> foregroundArg( "f", "foreground", "Foreground map", false, "foreground.png", "string", cmd);
 
-    ValueArg<string> trimapArg( "t", "trimap", "Trimap mask", false, "trimap.png", "string", cmd);
+    ValueArg<string> trimapArg( "t", "trimap", "Trimap", false, "trimap.png", "string", cmd);
 
     ValueArg<string> outputArg( "o", "output", "Output image", true, "out.png", "string", cmd);
 
