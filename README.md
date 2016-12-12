@@ -21,7 +21,7 @@ When solving for alpha, some alpha values are already specified as known foregro
 With D being a diagonal matrix where D(i,i) is 1 when the pixel is known foreground or background, vector β is 1 when it is known foreground, and λ being a large number to force the system to find a solution. If this is differentiated it becomes a sparse linear system.  
 ![eq2](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/equations/eq2.png)  
 This system is solved with the Eigen library for sparse matrices so that α can be found. 
-The intelligent scissors executable in the scissors library is the provided solution from [this project](http://courses.cs.washington.edu/courses/cse455/03wi/projects/project1/web/project1.htm). This can be used to trace out the known background and then trace the known foreground. These can then be combined into a trimap or sent directly into the RunLaplacian program. 
+The intelligent scissors executable in the scissors library is the provided solution from [this project](http://courses.cs.washington.edu/courses/cse455/03wi/projects/project1/web/project1.htm). This can be used to trace out the known background and then trace the known foreground. These can then be combined into a trimap or sent directly into the RunLaplacian program. The RunLaplacian program should run in two to three minutes for the provided inputs.
 ###Examples
 A picture of a woman taken from natural background and added onto an ocean background.  
 ![Woman next to Ocean](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/examples/womanOcean.jpg)  
