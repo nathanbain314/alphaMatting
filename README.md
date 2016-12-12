@@ -23,12 +23,12 @@ With D being a diagonal matrix where D(i,i) is 1 when the pixel is known foregro
 This system is solved with the Eigen library for sparse matrices so that α can be found. 
 The intelligent scissors executable in the scissors library is the provided solution from [this project](http://courses.cs.washington.edu/courses/cse455/03wi/projects/project1/web/project1.htm). This can be used to trace out the known background and then trace the known foreground. These can then be combined into a trimap or sent directly into the RunLaplacian program. 
 ###Examples
-A picture of a woman taken from natural background and added onto an ocean background.
-![Woman next to Ocean](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/examples/womanOcean.jpg)
-A squirrel with fuzzy edges rendered onto a different background
-![Squirrel on Enchanted Rock](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/examples/squirrelRock.jpg)
-The lighthouse on the left is the original cut, and the lighthouse on the right with my alpha mask.
-![Lighthouse on Enchanted Rock](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/examples/twoTowers.jpg)
+A picture of a woman taken from natural background and added onto an ocean background.  
+![Woman next to Ocean](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/examples/womanOcean.jpg)  
+A squirrel with fuzzy edges rendered onto a different background  
+![Squirrel on Enchanted Rock](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/examples/squirrelRock.jpg)  
+The lighthouse on the left is the original cut, and the lighthouse on the right with my alpha mask.  
+![Lighthouse on Enchanted Rock](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/examples/twoTowers.jpg)  
 
 ##Building
 [Libvips](http://www.vips.ecs.soton.ac.uk/index.php?title=Libvips) and [glm](http://glm.g-truc.net/0.9.8/index.html) are required in order for this to build. Since Eigen and clap are implemented in header files they should work fine.
