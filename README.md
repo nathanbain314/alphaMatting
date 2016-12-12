@@ -12,13 +12,13 @@ with ε as a regularization term.
 This can be reduced to J(α) = α^T * L * α, where L(i,j) = 
 ![eqn2](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/equations/eqn2.jpg)  
 with |w| being the size of the window around k, mean μ, and variance σ^2
-Finally this can be extended to an RGB image by setting L(i,j) to 
+Finally this can be extended to an RGB image by setting L(i,j) to   
 ![eqn3](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/equations/eqn3.jpg)  
 with covariance matrix Σ. 
 
-When solving for alpha, some alpha values are already specified as known foreground or known background. The equation can be modified to become 
+When solving for alpha, some alpha values are already specified as known foreground or known background. The equation can be modified to become  
 ![eq1](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/equations/eq1.png)  
-With D being a diagonal matrix where D(i,i) is 1 when the pixel is known foreground or background, vector β is 1 when it is known foreground, and λ being a large number to force the system to find a solution. If this is differentiated it becomes a sparse linear system. 
+With D being a diagonal matrix where D(i,i) is 1 when the pixel is known foreground or background, vector β is 1 when it is known foreground, and λ being a large number to force the system to find a solution. If this is differentiated it becomes a sparse linear system.  
 ![eq2](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/equations/eq2.png)  
 This system is solved with the Eigen library for sparse matrices so that α can be found. 
 The intelligent scissors executable in the scissors library is the provided solution from [this project](http://courses.cs.washington.edu/courses/cse455/03wi/projects/project1/web/project1.htm). This can be used to trace out the known background and then trace the known foreground. These can then be combined into a trimap or sent directly into the RunLaplacian program. 
