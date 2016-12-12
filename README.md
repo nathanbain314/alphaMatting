@@ -1,25 +1,25 @@
 # alphaMatting
-Intelligent scissors are a tool a cut an object out of an image by using a live wire that automatically wraps around that object. It still requires a user to guide the wire, but does much of the work and might create a better result than a user would. This produces an alpha mask that can then be used to add images together. However, the alpha mask is either one or zero; there is just a hard edge and no mix of alpha values. If the cut is imperfect or if it contains a mixture of foreground and background colors (such as hair), then this hard cut will be noticeable to the viewer. A solution to this is to implement an alpha matting algorithm to solve for the best alpha value for the pixel. I initially tried the Bayesian algorithm to find the alpha value but stopped when I couldn’t find any information on how to compute the Orchard-Bouman clusters that are essential to the algorithm. The algorithm that I settled on was the one described in "A Closed Form Solution to Natural Image Matting”. This algorithm creates a matting laplacian and then solves a sparse linear system in order to compute the alpha values. 
-The equation for an image I given the alpha map α the foreground F and background B is 
-I = α*F+(1-α)*B
-This is severely under-constrained as I is the only known value. This can be rewritten as
-α = a*I+b
-a = 1/(F-B)
-b=-b/(F-B)
+Intelligent scissors are a tool a cut an object out of an image by using a live wire that automatically wraps around that object. It still requires a user to guide the wire, but does much of the work and might create a better result than a user would. This produces an alpha mask that can then be used to add images together. However, the alpha mask is either one or zero; there is just a hard edge and no mix of alpha values. If the cut is imperfect or if it contains a mixture of foreground and background colors (such as hair), then this hard cut will be noticeable to the viewer. A solution to this is to implement an alpha matting algorithm to solve for the best alpha value for the pixel. I initially tried the Bayesian algorithm to find the alpha value but stopped when I couldn’t find any information on how to compute the Orchard-Bouman clusters that are essential to the algorithm. The algorithm that I settled on was the one described in "A Closed Form Solution to Natural Image Matting”. This algorithm creates a matting laplacian and then solves a sparse linear system in order to compute the alpha values.   
+The equation for an image I given the alpha map α the foreground F and background B is   
+I = α*F+(1-α)*B  
+This is severely under-constrained as I is the only known value. This can be rewritten as  
+α = a*I+b  
+a = 1/(F-B)  
+b=-b/(F-B)  
 assuming that F and B are smooth over a window w. The goal is then to find values to minimize the equation
-![eqn1](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/equations/eqn1.jpg)
+![eqn1](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/equations/eqn1.jpg)  
 with ε as a regularization term.
 This can be reduced to J(α) = α^T * L * α, where L(i,j) = 
-![eqn2](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/equations/eqn2.jpg)
+![eqn2](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/equations/eqn2.jpg)  
 with |w| being the size of the window around k, mean μ, and variance σ^2
 Finally this can be extended to an RGB image by setting L(i,j) to 
-![eqn3](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/equations/eqn3.jpg)
+![eqn3](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/equations/eqn3.jpg)  
 with covariance matrix Σ. 
 
 When solving for alpha, some alpha values are already specified as known foreground or known background. The equation can be modified to become 
-![eq1](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/equations/eq1.png)
+![eq1](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/equations/eq1.png)  
 With D being a diagonal matrix where D(i,i) is 1 when the pixel is known foreground or background, vector β is 1 when it is known foreground, and λ being a large number to force the system to find a solution. If this is differentiated it becomes a sparse linear system. 
-![eq2](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/equations/eq2.png)
+![eq2](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/equations/eq2.png)  
 This system is solved with the Eigen library for sparse matrices so that α can be found. 
 The intelligent scissors executable in the scissors library is the provided solution from [this project](http://courses.cs.washington.edu/courses/cse455/03wi/projects/project1/web/project1.htm). This can be used to trace out the known background and then trace the known foreground. These can then be combined into a trimap or sent directly into the RunLaplacian program. 
 ###Examples
