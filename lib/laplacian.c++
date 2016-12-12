@@ -14,30 +14,37 @@ using namespace TCLAP;
 using namespace std;
 using Eigen::MatrixXd;
 
-void generateLaplacian( string inputImage, unsigned char * alpha, string outputImage, double e )
+void generateMask( string inputImage, unsigned char * alpha, string outputImage, double e )
 {
+  // Load input images
   VImage image = VImage::vipsload( (char *)inputImage.c_str() );
   unsigned char * data = (unsigned char *)image.data();
 
   int width = image.width();
   int height = image.height();
 
+  // Prepare output image as greyscale image
   VImage output = VImage::black(width,height);
   unsigned char * outputData = (unsigned char *)output.data();
 
   int numPixels = width * height;
 
+  // Create blank Laplacian L
   double** L = new double*[numPixels];
   for( int i = 0; i < numPixels; ++i )
   {
     L[i] = new double[numPixels];
   }
 
-  glm::dmat3 I(1.0);
+  glm::dmat3 I(1.0); // Identity matrix
+
+  // For every pixel, update Laplacian
   for( int k = 0; k < numPixels; ++k )
   {
+    // x and y position in image
     int ky = k / width;
     int kx = k % width;
+    // start and end positions in the pixels window
     int wstart = ( kx > 0 ) ? kx - 1 : 0;
     int hstart = ( ky > 0 ) ? ky - 1 : 0;
     int wend = ( kx < width - 1 ) ? kx + 1 : width - 1;
@@ -49,17 +56,20 @@ void generateLaplacian( string inputImage, unsigned char * alpha, string outputI
     glm::dvec3 u;
     double sum[3][3];
 
+    // For every pixel in the window, update the mean and sum array
     for( int iy = hstart; iy <= hend; ++iy )
     {
       for( int ix = wstart; ix <= wend; ++ix )
       {
         int i = iy * width + ix;
+        // Added color to mean array
         u = u + glm::dvec3( data[3*i], data[3*i+1], data[3*i+2] );
 
         for( int a = 0; a <= 2; ++a )
         {
           for( int b = 0; b <= 2; ++b )
           {
+            // Added sum of pixels r, g, and b to sum array to later compute covariance matrix
             sum[a][b] += (double)((double)data[3*i + a] * (double)data[3*i + b]);
           }
         }
@@ -67,7 +77,10 @@ void generateLaplacian( string inputImage, unsigned char * alpha, string outputI
       }
     }
 
+    // Divide by window size to get mean vector
     u = u / w;
+
+    // Covariance equals the mean of the multiplication minux the multiplication of the means
     for( int a = 0; a <= 2; ++a )
     {
       for( int b = 0; b <= 2; ++b )
@@ -76,6 +89,7 @@ void generateLaplacian( string inputImage, unsigned char * alpha, string outputI
       }
     }
 
+    // For every two pixels in the window, update the Laplacian matrix
     for( int iy = hstart; iy <= hend; ++iy )
     {
       for( int ix = wstart; ix <= wend; ++ix )
@@ -87,12 +101,9 @@ void generateLaplacian( string inputImage, unsigned char * alpha, string outputI
           {
             int j = jy * width + jx;
             glm::dvec3 A = ( glm::dvec3( data[3*j], data[3*j+1], data[3*j+2] ) - u ) * ( glm::inverse( E + I * (e/w) ) * ( glm::dvec3( data[3*i], data[3*i+1], data[3*i+2] ) - u ));
-            double value = 1.0 + A[0] + A[1] + A[2]; //B[0] * A[0] + B[1] * A[1] + B[2] * A[2];
+            double value = 1.0 + A[0] + A[1] + A[2];
             value = ( ( i == j ) ? 1.0 : 0.0 ) - (1.0 / w) * value;
             L[i][j] += value;
-            if(i == 170 && j == 1)
-            {
-            }
           }
         }
       }
@@ -105,20 +116,24 @@ void generateLaplacian( string inputImage, unsigned char * alpha, string outputI
   std::vector<Eigen::Triplet<double>> coefficients;
   Eigen::VectorXd b(numPixels);
 
+  // Setup matrix and vector
   for( int i = 0; i < numPixels; ++i )
   {
     for( int j = 0; j < numPixels; ++j )
     {
       m(i,j) = L[i][j];
     }
+    // Add lambda if the pixel is a known foreground or background pixel
     if( alpha[i] == 0 || alpha[i] == 255 )
     {
       m(i,i) += 10000;
     }
 
+    // Set to lambda if the pixel is a known foreground pixel
     b(i) = ( alpha[i] == 255 ) ? 10000 : 0;
   }
 
+  // Setup coefficients for sparse matrix
   for( int i = 0; i < numPixels; ++i )
   {
     for( int j = 0; j < numPixels; ++j )
@@ -130,17 +145,20 @@ void generateLaplacian( string inputImage, unsigned char * alpha, string outputI
     }
   }
 
+  // Create sparse matrix
   Eigen::SparseMatrix<double> SparseL(numPixels,numPixels);
   SparseL.setFromTriplets(coefficients.begin(), coefficients.end());
 
+  // Solve sparse matrix
   Eigen::BiCGSTAB<Eigen::SparseMatrix<double> >  BCGST;
   BCGST.compute(SparseL);
-  Eigen::VectorXd X;
-  X = BCGST.solve(b)*255;
+  Eigen::VectorXd x;
+  x = BCGST.solve(b)*255;
 
+  // Set output data to results
   for( int i = 0; i < numPixels; ++i )
   {
-    outputData[i] = (unsigned char)(X(i));
+    outputData[i] = (unsigned char)(x(i));
   }
 
 //  clock_t end = clock();
@@ -153,6 +171,7 @@ int main( int argc, char **argv )
 {  
   try
   {
+    // Get command line inputs
     CmdLine cmd("Generates an alphamap from a trimap.", ' ', "1.0");
 
     SwitchArg generateSwitch("g","generate","Use foregound and background maps instead of trimap", cmd, false);
@@ -184,8 +203,10 @@ int main( int argc, char **argv )
 
     unsigned char * trimaskData;
 
+    // If generate flag is set to generate own trimask
     if( g )
     {
+      // Load foreground and background, and create trimask
       VImage foregound = VImage::vipsload( (char *)foregroundImage.c_str() );
       VImage background = VImage::vipsload( (char *)backgroundImage.c_str() );
       VImage trimask = VImage::black(foregound.width(),foregound.height());
@@ -194,6 +215,9 @@ int main( int argc, char **argv )
       unsigned char * backgroundData = (unsigned char *)background.data();
       trimaskData = (unsigned char *)trimask.data();
 
+      // If the foreground data is white, the foreground is known
+      // If the background data is black, the background is known
+      // Otherwise set to somewhere in between
       for( int i = 0; i < foregound.width() * foregound.height(); ++i )
       {
         if( foregroundData[i] == 255 )
@@ -216,7 +240,7 @@ int main( int argc, char **argv )
       trimaskData = (unsigned char *)trimask.data();
     }
 
-    generateLaplacian( inputImage, trimaskData, outputImage, e );
+    generateMask( inputImage, trimaskData, outputImage, e );
 
     vips_shutdown();
 
