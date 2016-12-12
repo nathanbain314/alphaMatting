@@ -25,11 +25,11 @@ Either a trimap or a pair of foreground and background maps are required. Images
 
 #Resources used
 ##Theory
-[A Closed Form Solution to Natural Image Matting](http://www.wisdom.weizmann.ac.il/~levina/papers/Matting-Levin-Lischinski-Weiss-CVPR06.pdf)
-[Fast Matting Using Large Kernel Matting Laplacian Matrices](http://kaiminghe.com/publications/cvpr10matting.pdf)
+[A Closed Form Solution to Natural Image Matting](http://www.wisdom.weizmann.ac.il/~levina/papers/Matting-Levin-Lischinski-Weiss-CVPR06.pdf)  
+[Fast Matting Using Large Kernel Matting Laplacian Matrices](http://kaiminghe.com/publications/cvpr10matting.pdf)  
 ##Code
-[Libvips](http://www.vips.ecs.soton.ac.uk/index.php?title=Libvips)
-[Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page)
-[glm](http://glm.g-truc.net/0.9.8/index.html)
-[tclap](http://tclap.sourceforge.net)
-[Scissors](http://courses.cs.washington.edu/courses/cse455/03wi/projects/project1/web/project1.htm)
+[Libvips](http://www.vips.ecs.soton.ac.uk/index.php?title=Libvips)  
+[Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page)  
+[glm](http://glm.g-truc.net/0.9.8/index.html)  
+[tclap](http://tclap.sourceforge.net)  
+[Scissors](http://courses.cs.washington.edu/courses/cse455/03wi/projects/project1/web/project1.htm)  
