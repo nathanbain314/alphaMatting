@@ -22,7 +22,7 @@ With D being a diagonal matrix where D(i,i) is 1 when the pixel is known foregro
 ![eq2](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/equations/eq2.png)  
 This system is solved with the Eigen library for sparse matrices so that α can be found. 
 The intelligent scissors executable in the scissors library is the provided solution from [this project](http://courses.cs.washington.edu/courses/cse455/03wi/projects/project1/web/project1.htm). This can be used to trace out the known background and then trace the known foreground. These can then be combined into a trimap or sent directly into the RunLaplacian program. The RunLaplacian program should run in two to three minutes for the provided inputs.
-###Results
+### Results
 A picture of a woman taken from natural background and added onto an ocean background.  
 ![Woman next to Ocean](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/examples/womanOcean.jpg)  
 A squirrel with fuzzy edges rendered onto a different background  
@@ -31,17 +31,17 @@ The lighthouse on the left is the original cut, and the lighthouse on the right 
 ![Lighthouse on Enchanted Rock](https://raw.githubusercontent.com/nathanbain314/alphaMatting/master/examples/twoTowers.jpg)  
 Results were generally poorer that I expected them to be when I was started the project. Initially I tried using Chuang's Bayesian matting approach, however I hit a roadblock when I could not find any information about implementing the Orchard-Bouman cluster algorithm save for a complicated 38 page paper from 1991. I also looked into the Poisson matting algorithm, but eventually decided the current algorithm. I am sure that the matting Laplacian is computed correctly, as I checked the means, covariance matrix, and pixel id's to make sure that they were the correct values. The rows also sum to zero like the correct matrix would. Eigen should be solving the linear system correctly as well, so I couldn’t pin point any problem in the implementation. Despite not being perfect, the results are still adequate. The combination images were created using GIMP. 
 
-##Building
+## Building
 [Libvips](http://www.vips.ecs.soton.ac.uk/index.php?title=Libvips) and [glm](http://glm.g-truc.net/0.9.8/index.html) are required in order for this to build. Since Eigen and clap are implemented in header files they should work fine.
 ```
 mkdir build
 make all
 ```
 
-#RunLaplacian
+# RunLaplacian
 This takes in either a trimap or a pair of foreground and background maps and creates an alpha mask. Foreground and background maps can be created with the executable in the scissors directory. These can then either be manually assembled into a trimap, or they can be passed directly into the program.
 
-##Options
+## Options
 - -i,  --input : Input image (required)
 - -o, --output : Output image (required)
 - -t, --trimap : Trimap
@@ -50,20 +50,20 @@ This takes in either a trimap or a pair of foreground and background maps and cr
 - -e, --epsilon : Epsilon value
 - -g, --generate : Use foregound and background maps instead of trimap
 
-##Tips
+## Tips
 Either a trimap or a pair of foreground and background maps are required. Images are loaded with vipsload which takes in most image types, but it won't accept .tga files, which is the output format of the scissors tool, so these will have to be converted with ```convert```, gimp, or some other tool. The default epsilon is the suggested value of 1e-7. This code was built on a mac and will work on one. The scissors code is from the [this scissors solution](http://courses.cs.washington.edu/courses/cse455/03wi/projects/project1/web/project1.htm) and is a windows executable. It can however be run with [Wine](https://www.winehq.org) for use on a mac.
 
-##Example
+## Example
 ```
 ./RunLaplacian -i examples/squirrel.jpg -o out.jpg -t examples/squirrelTrimap.png
 ./RunLaplacian -i examples/squirrel.jpg -o out.jpg -f examples/squirrelForeground.png -b examples/squirrelBackground.png -g
 ```
 
-#Resources used
-##Theory
+# Resources used
+## Theory
 [A Closed Form Solution to Natural Image Matting](http://www.wisdom.weizmann.ac.il/~levina/papers/Matting-Levin-Lischinski-Weiss-CVPR06.pdf)  
 [Fast Matting Using Large Kernel Matting Laplacian Matrices](http://kaiminghe.com/publications/cvpr10matting.pdf)  
-##Code
+## Code
 [Libvips](http://www.vips.ecs.soton.ac.uk/index.php?title=Libvips)  
 [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page)  
 [glm](http://glm.g-truc.net/0.9.8/index.html)  
